@@ -28,8 +28,7 @@ struct CalcScreen: View {
 				Spacer()
 				
 				// The actual text
-				//Text("\(convertNumb(toConvert: value))")
-				Text("\(value)")
+				Text("\(convertNumb(toConvert: value))")
 					// I like mono ok?
 					.font(.system(size: 100, design: .monospaced))
 					
