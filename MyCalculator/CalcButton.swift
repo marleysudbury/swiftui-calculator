@@ -50,69 +50,95 @@ struct CalcButton: View {
     }
 	
 	func appendToValue() {
-		if label == "." {
-			// Add decimal part to value
-			if !appData.decimal {
-				if appData.value == appData.cache {
-					appData.value = "0."
-				} else {
-					appData.value = "\(appData.value)\(label)"
-				}
-				appData.decimal = true
-			}
-		} else if label == "AC" {
-			// Reset all of the appData
-			ChangeValue(newValue: "0", cache: true)
-			
-			// Reset active of buttons
-			self.ResetActive()
-		} else if label == "C" {
-			// Reset only the current value
-			ChangeValue(newValue: "0", cache: false)
-			appData.ac = true
-		} else if label == "+/-" {
-			// Toggle the sign of appData.value
-			// NOTE: the user can toggle 0s
-			
-			// In case the user presses +/- after an operation
-			if appData.value == appData.cache {
-				appData.value = "0"
-			}
-			
-			// The index after the startIndex, used to strip the first char
-			let afterIndex = appData.value.index(after: appData.value.startIndex)
-			
-			if appData.value[appData.value.startIndex] == "-" {
-				// Go from - to +
-				appData.value = String(appData.value[afterIndex...])
-			} else {
-				// Go from + to -
-				appData.value = "-\(appData.value)"
-			}
-		} else {
+		// Determine what action to take based on label
+		switch label {
+		case ".":
+			pressDecimal()
+		case "AC":
+			pressAC()
+		case "C":
+			pressC()
+		case "+/-":
+			pressToggleSign()
+		default:
 			// Dealing with numbers and operations
 			if Double(label) != nil {
-				// The button is a number
-				// Switch AC -> C
-				appData.ac = false
-				if appData.value == appData.cache || appData.value == "0" {
-					// Overwrite value with input
-					appData.value = "\(label)"
-					appData.decimal = false
-				} else {
-					// Append the number to the end of value
-					appData.value = "\(appData.value)\(label)"
-				}
+				pressNumber()
 			} else {
-				// The button is not a number
-				if label == "=" {
-					// Work it out
-					Equals()
-				} else if appData.active[label] != nil {
-					// Make the button pressed 'active'
-					NewActive(is: label)
-				}
+				pressOperation()
 			}
+		}
+	}
+	
+	func pressDecimal() {
+		// Add decimal part to value
+		if !appData.decimal {
+			if appData.value == appData.cache {
+				appData.value = "0."
+			} else {
+				appData.value = "\(appData.value)\(label)"
+			}
+			appData.decimal = true
+		}
+	}
+	
+	func pressAC() {
+		// Reset all of the appData
+		ChangeValue(newValue: "0", cache: true)
+		
+		// Reset active of buttons
+		self.ResetActive()
+	}
+	
+	func pressC() {
+		// Reset only the current value
+		ChangeValue(newValue: "0", cache: false)
+		appData.ac = true
+	}
+	
+	func pressToggleSign() {
+		// Toggle the sign of appData.value
+		// NOTE: the user can toggle 0s
+		
+		// In case the user presses +/- after an operation
+		if appData.value == appData.cache {
+			appData.value = "0"
+		}
+		
+		// The index after the startIndex, used to strip the first char
+		let afterIndex = appData.value.index(after: appData.value.startIndex)
+		
+		if appData.value[appData.value.startIndex] == "-" {
+			// Go from - to +
+			appData.value = String(appData.value[afterIndex...])
+		} else {
+			// Go from + to -
+			appData.value = "-\(appData.value)"
+		}
+	}
+	
+	func pressNumber() {
+		// The button is a number
+		// Switch AC -> C
+		appData.ac = false
+		if appData.value == appData.cache || appData.value == "0" {
+			// Overwrite value with input
+			appData.value = "\(label)"
+			appData.decimal = false
+		} else {
+			// Append the number to the end of value
+			appData.value = "\(appData.value)\(label)"
+		}
+	}
+	
+	func pressOperation() {
+		// The button is not a number
+		if label == "=" {
+			// Work it out
+			Equals()
+		} else if appData.active[label] != nil {
+			// Make the button pressed 'active'
+			NewActive(is: label)
 		}
 	}
 	
