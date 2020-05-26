@@ -11,8 +11,7 @@ import SwiftUI
 struct CalcScreen: View {
     // This is the 'screen' that displays the current value
     
-    // The value displayed as a string
-    var value: String
+    @EnvironmentObject var appData: DataStoreXD
     
     // This is what is returned to the screen
     var body: some View {
@@ -28,7 +27,7 @@ struct CalcScreen: View {
                 Spacer()
                 
                 // The actual text
-                Text("\(convertNumb(toConvert: value))")
+                Text("\((appData.error ? "ERROR" : convertNumb(toConvert: appData.value)))")
                     // I like mono ok?
                     .font(.system(size: 100, design: .monospaced))
                     
@@ -59,7 +58,7 @@ struct CalcScreen: View {
     func copyToClipboard() {
         // Adapted from: https://www.hackingwithswift.com/example-code/system/how-to-copy-text-to-the-clipboard-using-uipasteboard
         let pasteboard = UIPasteboard.general
-        pasteboard.string = value
+        pasteboard.string = appData.value
     }
     
     // String -> Number -> String
@@ -90,7 +89,8 @@ struct CalcScreen: View {
 
 struct CalcScreen_Previews: PreviewProvider {
     static var previews: some View {
-        CalcScreen(value: "10000")
+        CalcScreen()
+            .environmentObject(DataStoreXD(value: "0"))
             .previewLayout(.fixed(width: 100, height: 70))
     }
 }

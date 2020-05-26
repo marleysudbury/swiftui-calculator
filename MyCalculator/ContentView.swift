@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         VStack{
             // Display
-            CalcScreen(value: appData.value)
+            CalcScreen()
                 .padding(.horizontal)
             Keyboard(buttonSize: buttonSize, spacing: spacing)
         }
@@ -28,6 +28,7 @@ final class DataStoreXD: ObservableObject {
     @Published var decimal: Bool
     @Published var cache: String
     @Published var ac: Bool
+    @Published var error: Bool
     @Published var active = [
         "+": false,
         "-": false,
@@ -39,12 +40,15 @@ final class DataStoreXD: ObservableObject {
         self.decimal = false
         self.cache = "0"
         self.ac = true
+        self.error = false
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environmentObject(DataStoreXD(value: "0"))
+        ContentView()
+            .environmentObject(DataStoreXD(value: "0"))
             .environment(\.colorScheme, .dark)
     }
 }
+

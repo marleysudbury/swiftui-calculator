@@ -50,6 +50,9 @@ struct CalcButton: View {
     }
     
     func appendToValue() {
+        // Remove error state on button press
+        appData.error = false
+        
         // Determine what action to take based on label
         switch label {
         case ".":
@@ -193,7 +196,16 @@ struct CalcButton: View {
                 output = lCache - lValue
             case "/":
                 // Divide the numbers
-                output = lCache / lValue
+                
+                // Handle div by 0
+                if lValue == 0 {
+                    appData.error = true
+                    appData.ac = true
+                    appData.decimal = false
+                    output = 0
+                } else {
+                    output = lCache / lValue
+                }
             case "x":
                 // Times the numbers
                 output = lCache * lValue
