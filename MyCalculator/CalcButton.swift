@@ -53,8 +53,12 @@ struct CalcButton: View {
 		if label == "." {
 			// Add decimal part to value
 			if !appData.decimal {
+				if appData.value == appData.cache {
+					appData.value = "0."
+				} else {
+					appData.value = "\(appData.value)\(label)"
+				}
 				appData.decimal = true
-				appData.value = "\(appData.value)\(label)"
 			}
 		} else if label == "AC" {
 			// Reset all of the appData
@@ -68,13 +72,14 @@ struct CalcButton: View {
 			appData.ac = true
 		} else {
 			// Dealing with numbers and operations
-			if (Int(label) != nil) {
+			if Double(label) != nil {
 				// The button is a number
 				// Switch AC -> C
 				appData.ac = false
-				if appData.value == appData.cache {
+				if appData.value == appData.cache || appData.value == "0" {
 					// Overwrite value with input
 					appData.value = "\(label)"
+					appData.decimal = false
 				} else {
 					// Append the number to the end of value
 					appData.value = "\(appData.value)\(label)"
@@ -93,62 +98,68 @@ struct CalcButton: View {
 	}
 	
 	func Equals() {
-		// Turn the screen value -> float
-		let lValue = Float(appData.value)!
+		// Turn the screen value -> double
+		let qValue = Double(appData.value)
 		
-		// Turn the cached value -> float
-		let lCache = Float(appData.cache)!
+		// Turn the cached value -> double
+		let qCache = Double(appData.cache)
 		
-		// This will be used to convert back to sting
-		let numberFormatter = NumberFormatter()
-		numberFormatter.numberStyle = .decimal
-		
-		// This finds the key for the active operation
-		// https://stackoverflow.com/a/33719772
-		let truth = appData.active.filter { (k, v) -> Bool in v == true }
-			.map { (k, v) -> String in k }
-		
-		// Stores the key found above
-		let operation: String
-		
-		// Used incase the search found none
-		if truth.endIndex != 0 {
-			// Unwrap the operation
-			operation = truth[0]
-		} else {
-			// Defaults to add
-			operation = "+"
+		if let lValue = qValue, let lCache = qCache {
+			// This finds the key for the active operation
+			// Adapted from: https://stackoverflow.com/a/33719772
+			let truth = appData.active.filter { (k, v) -> Bool in v == true }
+				.map { (k, v) -> String in k }
+			
+			// Stores the key found above
+			let operation: String
+			
+			// Used incase the search found none
+			if truth.endIndex != 0 {
+				// Unwrap the operation
+				operation = truth[0]
+			} else {
+				// Defaults to add
+				// TODO: change this to be preivous operation
+				operation = "+"
+			}
+			
+			// Stores the output of the operation
+			let output: Double
+			
+			switch operation {
+			case "+":
+				// Add the numbers
+				output = lCache + lValue
+			case "-":
+				// Subtract the numbers
+				output = lCache - lValue
+			case "/":
+				// Divide the numbers
+				output = lCache / lValue
+			case "x":
+				// Times the numbers
+				output = lCache * lValue
+			default:
+				// Defaults to outputting the screen value
+				output = lValue
+			}
+			
+			// Convert to string
+			var newValue = String(output)
+			
+			// This is to fix decimal 'bug'
+			let beforeEnd = newValue.index(before: newValue.endIndex)
+			let bBeforeEnd = newValue.index(before: beforeEnd)
+			if newValue[beforeEnd] == "0", newValue[bBeforeEnd] == "." {
+				newValue = String(newValue[...newValue.index(before: bBeforeEnd)])
+			}
+			
+			// Store new value
+			ChangeValue(newValue: (newValue.startIndex != newValue.endIndex ? newValue : "0"), cache: true)
+
+			// Reset active of buttons
+			ResetActive()
 		}
-		
-		// Stores the output of the operation
-		let output: Float
-		
-		switch operation {
-		case "+":
-			// Add the numbers
-			output = lCache + lValue
-		case "-":
-			// Subtract the numbers
-			output = lCache - lValue
-		case "/":
-			// Divide the numbers
-			output = lCache / lValue
-		case "x":
-			// Times the numbers
-			output = lCache * lValue
-		default:
-			// Defaults to outputting the screen value
-			output = lValue
-		}
-		
-		// Convert to string
-		let newValue = numberFormatter.string(from: NSNumber(value:output))!
-		
-		// Store new value
-		ChangeValue(newValue: newValue, cache: true)
-		
-		// Reset active of buttons
-		ResetActive()
 	}
 	
 	func NewActive(is label: String) {
@@ -171,7 +182,7 @@ struct CalcButton: View {
 		appData.value = newValue
 		
 		// Set decimal to true if it has decimal part
-		appData.decimal = (appData.value.contains(".") ? true : false)
+		appData.decimal = (newValue.contains(".") ? true : false)
 		
 		if cache {
 			// Store new value in cache as well

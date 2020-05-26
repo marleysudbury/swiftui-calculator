@@ -10,24 +10,43 @@ import SwiftUI
 
 struct CalcScreen: View {
 	// This is the 'screen' that displays the current value
-	var value: String // The value displayed as a string
+	
+	// The value displayed as a string
+	var value: String
+	
+	// This is what is returned to the screen
     var body: some View {
+		// Vertical stack to allow spacer
 		VStack{
+			// Spacer so it stays at the bottom
+			// of available space
 			Spacer()
+			
+			// Horizontal stack to allow spacer
 			HStack {
-				// So the number's at the bottom
+				// So the number's at the right
 				Spacer()
-				Text("\(convertNumb(toConvert: value))")
+				
+				// The actual text
+				//Text("\(convertNumb(toConvert: value))")
+				Text("\(value)")
 					// I like mono ok?
 					.font(.system(size: 100, design: .monospaced))
+					
 					// Right aligned
 					.multilineTextAlignment(.trailing)
+					
 					// Color
 					.foregroundColor(Color("displayText"))
+					
 					// All on one line baby
 					.lineLimit(1)
+					
 					// Text can get smoller
 					.minimumScaleFactor(0.01)
+					
+					// Allows the user to copy
+					// TODO: Improve this it's bad
 					.onTapGesture {
 						self.copyToClipboard()
 					}
@@ -37,13 +56,18 @@ struct CalcScreen: View {
 		.background(Color("bg"))
     }
 	
+	// Function allows copying value to clipboard
 	func copyToClipboard() {
+		// Adapted from: https://www.hackingwithswift.com/example-code/system/how-to-copy-text-to-the-clipboard-using-uipasteboard
 		let pasteboard = UIPasteboard.general
 		pasteboard.string = value
 	}
 	
+	// String -> Number -> String
+	// This adds the commas to the number
 	func convertNumb(toConvert: String) -> String {
-		let largeNumber = Float(toConvert)!
+		// TODO: Add code ref here
+		let largeNumber = Double(toConvert)!
 		let numberFormatter = NumberFormatter()
 		numberFormatter.numberStyle = .decimal
 		var formattedNumber = numberFormatter.string(from: NSNumber(value:largeNumber))!

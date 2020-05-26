@@ -42,10 +42,6 @@ final class DataStoreXD: ObservableObject {
 	}
 }
 
-//struct ColorManager {
-//	static let 
-//}
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
 		ContentView().environmentObject(DataStoreXD(value: "0"))
