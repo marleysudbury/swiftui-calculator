@@ -3,7 +3,7 @@
 //  MyCalculator
 //
 //  Created by marleysudbury on 23/05/2020.
-//  Copyright © 2020 marleysudbury. All rights reserved.
+//  Repo: https://github.com/marleysudbury/swiftui-calculator/
 //
 
 import SwiftUI

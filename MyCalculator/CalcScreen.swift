@@ -3,7 +3,7 @@
 //  MyCalculator
 //
 //  Created by marleysudbury on 23/05/2020.
-//  Copyright © 2020 marleysudbury. All rights reserved.
+//  Repo: https://github.com/marleysudbury/swiftui-calculator/
 //
 
 import SwiftUI
@@ -64,25 +64,51 @@ struct CalcScreen: View {
     // String -> Number -> String
     // This adds the commas to the number
     func convertNumb(toConvert: String) -> String {
+        // TODO: Make this more elegant, it is a bit chonky
         // TODO: Add code ref here
+        
+        // Converts the input to a double
         let largeNumber = Double(toConvert)!
+        
+        // Used to format the number
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         var formattedNumber = numberFormatter.string(from: NSNumber(value:largeNumber))!
+        
+        // Check if the input has a decimal
+        // Useful if the user has just typed a decimal point
         if toConvert.contains(".") {
+            // The index of the decimal point
             let lBound = toConvert.firstIndex(of: ".")!
+            
+            // The end index
             let uBound = toConvert.endIndex
+            
+            // Substring of the decimal part of the value
+            // Includes the decimal point
             let decimalSub = toConvert[lBound..<uBound]
+            
+            // Doing the same thing again but for the integer part
             let lBound2 = formattedNumber.startIndex
             let uBound2: String.Index
+            
+            // Check if the formatted number already contains a decimal point
             if formattedNumber.contains(".") {
+                // Use the index of the decimal as the upper bound
                 uBound2 = formattedNumber.firstIndex(of: ".")!
             } else {
+                // Use the end index as the upper bound
                 uBound2 = formattedNumber.endIndex
             }
+            
+            // Substring of the integer part of the value
             let intSub = formattedNumber[lBound2..<uBound2]
+            
+            // Combine the two parts into a string
             formattedNumber = "\(intSub)\(decimalSub)"
         }
+        
+        // Return the stringified number
         return formattedNumber
     }
 }
