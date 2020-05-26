@@ -70,6 +70,25 @@ struct CalcButton: View {
 			// Reset only the current value
 			ChangeValue(newValue: "0", cache: false)
 			appData.ac = true
+		} else if label == "+/-" {
+			// Toggle the sign of appData.value
+			// NOTE: the user can toggle 0s
+			
+			// In case the user presses +/- after an operation
+			if appData.value == appData.cache {
+				appData.value = "0"
+			}
+			
+			// The index after the startIndex, used to strip the first char
+			let afterIndex = appData.value.index(after: appData.value.startIndex)
+			
+			if appData.value[appData.value.startIndex] == "-" {
+				// Go from - to +
+				appData.value = String(appData.value[afterIndex...])
+			} else {
+				// Go from + to -
+				appData.value = "-\(appData.value)"
+			}
 		} else {
 			// Dealing with numbers and operations
 			if Double(label) != nil {
