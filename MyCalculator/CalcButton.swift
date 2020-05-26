@@ -60,6 +60,8 @@ struct CalcButton: View {
             pressC()
         case "+/-":
             pressToggleSign()
+        case "%":
+            pressPercent()
         default:
             // Dealing with numbers and operations
             if Double(label) != nil {
@@ -114,6 +116,17 @@ struct CalcButton: View {
         } else {
             // Go from + to -
             appData.value = "-\(appData.value)"
+        }
+    }
+    
+    func pressPercent() {
+        // Divide the current value by 100
+        // NOTE: I'm not sure if this is very useful
+        let qValue = Float(appData.value)
+        if let fValue = qValue, fValue != 0 {
+            appData.value = String(fValue/100)
+        } else {
+            appData.value = "0"
         }
     }
     
@@ -253,4 +266,5 @@ struct CalcButton_Previews: PreviewProvider {
             }.padding(.all).previewLayout(.sizeThatFits)
     }
 }
+
 
