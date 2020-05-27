@@ -10,6 +10,8 @@ import SwiftUI
 
 struct CalcButton: View {
     @EnvironmentObject var appData: DataStoreXD
+    // The character limit (not including commas)
+    let charLim: Int
     var label: String
     var color: Int
     var width: CGFloat
@@ -24,6 +26,7 @@ struct CalcButton: View {
         self.width = width
         self.height = height
         self.active = active
+        self.charLim = 9
         
         if color == 1 {
             self.foreC = Color("buttonText1")
@@ -79,9 +82,9 @@ struct CalcButton: View {
         // Add decimal part to value
         if !appData.decimal {
             if appData.value == appData.cache {
-                appData.value = "0."
+                ChangeValue(newValue: "0.")
             } else {
-                appData.value = "\(appData.value)\(label)"
+                ChangeValue(newValue: "\(appData.value)\(label)")
             }
             appData.decimal = true
         }
@@ -107,7 +110,7 @@ struct CalcButton: View {
         
         // In case the user presses +/- after an operation
         if appData.value == appData.cache {
-            appData.value = "0"
+            ChangeValue(newValue: "0")
         }
         
         // The index after the startIndex, used to strip the first char
@@ -115,10 +118,10 @@ struct CalcButton: View {
         
         if appData.value[appData.value.startIndex] == "-" {
             // Go from - to +
-            appData.value = String(appData.value[afterIndex...])
+            ChangeValue(newValue: String(appData.value[afterIndex...]))
         } else {
             // Go from + to -
-            appData.value = "-\(appData.value)"
+            ChangeValue(newValue: "-\(appData.value)")
         }
     }
     
@@ -127,9 +130,9 @@ struct CalcButton: View {
         // NOTE: I'm not sure if this is very useful
         let qValue = Float(appData.value)
         if let fValue = qValue, fValue != 0 {
-            appData.value = String(fValue/100)
+            ChangeValue(newValue: String(fValue/100))
         } else {
-            appData.value = "0"
+            ChangeValue(newValue: "0")
         }
     }
     
@@ -139,11 +142,10 @@ struct CalcButton: View {
         appData.ac = false
         if appData.value == appData.cache || appData.value == "0" {
             // Overwrite value with input
-            appData.value = "\(label)"
-            appData.decimal = false
+            ChangeValue(newValue: "\(label)")
         } else {
             // Append the number to the end of value
-            appData.value = "\(appData.value)\(label)"
+            ChangeValue(newValue: "\(appData.value)\(label)")
         }
     }
     
@@ -221,6 +223,7 @@ struct CalcButton: View {
             let beforeEnd = newValue.index(before: newValue.endIndex)
             let bBeforeEnd = newValue.index(before: beforeEnd)
             if newValue[beforeEnd] == "0", newValue[bBeforeEnd] == "." {
+                print("Here?")
                 newValue = String(newValue[...newValue.index(before: bBeforeEnd)])
             }
             
@@ -248,11 +251,33 @@ struct CalcButton: View {
     }
     
     func ChangeValue(newValue: String, cache: Bool = false) {
-        // Store new value in appData
-        appData.value = newValue
-        
-        // Set decimal to true if it has decimal part
-        appData.decimal = (newValue.contains(".") ? true : false)
+        // Ensure the number doesn't get too big
+        if newValue.count <= charLim {
+            // Store new value in appData
+            appData.value = newValue
+            
+            // Check decimal
+            if newValue.contains(".") {
+                appData.decimal = true
+            } else {
+                appData.decimal = false
+            }
+        } else if newValue.count > charLim, newValue.count <= charLim+1 {
+            print("\(newValue.count) and \(charLim)")
+            // The start index
+            let startIndex = newValue.startIndex
+            
+            // The limit index
+            let ttIndex = newValue.index(startIndex, offsetBy: charLim-1)
+            
+            // Crop the new value
+            ChangeValue(newValue: String(newValue[startIndex...ttIndex]), cache: cache)
+        } else {
+            ChangeValue(newValue: "0", cache: true)
+            appData.error = true
+            appData.value = "0"
+            appData.cache = "0"
+        }
         
         if cache {
             // Store new value in cache as well
@@ -278,5 +303,6 @@ struct CalcButton_Previews: PreviewProvider {
             }.padding(.all).previewLayout(.sizeThatFits)
     }
 }
+
 
 
