@@ -140,7 +140,8 @@ struct CalcButton: View {
         // The button is a number
         // Switch AC -> C
         appData.ac = false
-        if appData.value == appData.cache || appData.value == "0" {
+        if appData.unchanged {
+            appData.unchanged = false
             // Overwrite value with input
             ChangeValue(newValue: "\(label)")
         } else {
@@ -151,6 +152,7 @@ struct CalcButton: View {
     
     func pressOperation() {
         // The button is not a number
+        appData.unchanged = true
         if label == "=" {
             // Work it out
             Equals()
@@ -251,6 +253,9 @@ struct CalcButton: View {
     }
     
     func ChangeValue(newValue: String, cache: Bool = false) {
+        if newValue == "0" {
+            appData.unchanged = true
+        }
         // Ensure the number doesn't get too big
         if newValue.count <= charLim {
             // Store new value in appData
@@ -262,7 +267,8 @@ struct CalcButton: View {
             } else {
                 appData.decimal = false
             }
-        } else if newValue.count > charLim, newValue.count <= charLim+1 {
+        } else if newValue.count == charLim + 1 {
+            print(newValue)
             print("\(newValue.count) and \(charLim)")
             // The start index
             let startIndex = newValue.startIndex
@@ -271,12 +277,17 @@ struct CalcButton: View {
             let ttIndex = newValue.index(startIndex, offsetBy: charLim-1)
             
             // Crop the new value
-            ChangeValue(newValue: String(newValue[startIndex...ttIndex]), cache: cache)
+            ChangeValue(newValue: String(newValue[startIndex...ttIndex]), cache: false)
         } else {
-            ChangeValue(newValue: "0", cache: true)
-            appData.error = true
-            appData.value = "0"
-            appData.cache = "0"
+            if label == "=" {
+                ChangeValue(newValue: "0", cache: true)
+                appData.error = true
+                appData.ac = true
+                appData.value = "0"
+                appData.cache = "0"
+            } else {
+                print("Round up old chap!")
+            }
         }
         
         if cache {
@@ -303,6 +314,7 @@ struct CalcButton_Previews: PreviewProvider {
             }.padding(.all).previewLayout(.sizeThatFits)
     }
 }
+
 
 
 

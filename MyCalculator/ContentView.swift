@@ -50,6 +50,8 @@ final class DataStoreXD: ObservableObject {
     // Whether 'ERROR' should be displayed on screen
     @Published var error: Bool
     
+    @Published var unchanged: Bool
+    
     // Which, if any, of the operation buttons is active
     @Published var active = [
         "+": false,
@@ -65,6 +67,7 @@ final class DataStoreXD: ObservableObject {
         self.cache = "0"
         self.ac = true
         self.error = false
+        self.unchanged = true
     }
 }
 
@@ -75,4 +78,5 @@ struct ContentView_Previews: PreviewProvider {
             .environment(\.colorScheme, .dark)
     }
 }
+
 
