@@ -16,4 +16,4 @@ Sparkly features including (and limited to):
 
 In that order!
 
-The code is reasonably documented(?) but you may find more details at [the Wiki](https://github.com/marleysudbury/swiftui-calculator/wiki). If you want an understanding of my inner pain, read through the issue comments. I will put a write up on my website at some point, probably.
+The code is reasonably documented(?) but you may find more details at [the Wiki](https://github.com/marleysudbury/swiftui-calculator/wiki). If you want an understanding of my inner pain, read through the issue comments. If that is too much to ask, you could just read [my blog post](https://marleysudbury.github.io/blog/2020/05/28/).
